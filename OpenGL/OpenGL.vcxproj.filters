@@ -18,24 +18,27 @@
     <ClCompile Include="OpenGL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CustomObject.h">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="CustomObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Cube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CustomObject.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="flying_camera.h">
+    <ClInclude Include="cube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="shader.h">
+    <ClInclude Include="flying_camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="object.h">
@@ -44,7 +47,7 @@
     <ClInclude Include="objectStructs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="cube.h">
+    <ClInclude Include="objectManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

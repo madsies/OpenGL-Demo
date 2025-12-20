@@ -1,24 +1,42 @@
 #pragma once
+#include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+/*
 
-struct Object
+	General Object Interface 
+
+*/
+
+class Object // Interface
 {
-	glm::vec3 pos = glm::vec3(0.0f);
-	glm::vec3 rotation = glm::vec3(0.0f);
-	glm::vec3 scale = glm::vec3(1.0f);
+public:
+	virtual ~Object() = default;
 
-	glm::mat4 getModelMatrix() const
-	{
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, pos);
+	virtual void update(float deltaTime) {}
+	virtual void draw(GLuint program) = 0;
 
-		model = glm::rotate(model, glm::radians(rotation.x), glm::vec3(1, 0, 0));
-		model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0, 1, 0));
-		model = glm::rotate(model, glm::radians(rotation.z), glm::vec3(0, 0, 1));
+	GLuint vao, vbo, ebo;
+	GLsizei indexCount;
 
-		model = glm::scale(model, scale);
-		return model;
-	}
+	glm::vec3 position = {};
+	glm::vec3 rotation = {};
+	glm::vec3 scale = { 1, 1, 1 };
+	
+protected:
+	glm::mat4 modelMatrix{ 1.0f };
+
+	virtual void updateModelMatrix();
+
 };
+
+void Object::updateModelMatrix()
+{
+	modelMatrix = glm::mat4(1.0f);
+	modelMatrix = glm::translate(modelMatrix, position);
+	modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.x), { 1,0,0 });
+	modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.y), { 0,1,0 });
+	modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.z), { 0,0,1 });
+	modelMatrix = glm::scale(modelMatrix, scale);
+}

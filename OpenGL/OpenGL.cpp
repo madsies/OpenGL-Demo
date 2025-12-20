@@ -6,11 +6,11 @@
 #include "flying_camera.h"
 #include "shader.h"
 #include "cube.h"
-#include "CustomObject.h"
 #include <glm/gtc/type_ptr.hpp>
 #include <string>
 #include <sstream>
 #include <iomanip> 
+#include "objectManager.h"
 
 // Buffer Consts
 constexpr int BUFFER_COUNT = 2;
@@ -24,9 +24,8 @@ GLuint EBOs[EBO_COUNT];
 constexpr int SCREEN_WIDTH = 1920;
 constexpr int SCREEN_HEIGHT = 1080;
 
-// Object Pools
-std::vector<CustomObject> opaqueObjectPool;
-std::vector<CustomObject> transparentObjectPool;
+// Object Management
+ObjectManager* objManager = new ObjectManager(Buffers, VAOs, EBOs);
 
 // Background Col
 static const GLfloat bgd[] = { 0.35f, 0.35f, 0.35f, 0.35f };
@@ -65,21 +64,15 @@ void render(GLuint program)
     projection = glm::perspective(glm::radians(45.f), (float) SCREEN_WIDTH / (float) SCREEN_HEIGHT, .1f, 50.f);
     glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
-    for (CustomObject& obj : opaqueObjectPool)
-    {
-        obj.draw(program);
-    }
+    objManager->renderObjects(program); 
 }
 
 // Make Registry eventually, clean up main class.
 void createItems()
 {
     Mesh cube = Cube::generate();
-    CustomObject cubeObj(cube, VAOs[0], Buffers[0], EBOs[0]);
-    cubeObj.setScale(glm::vec3(2.0f));
-    cubeObj.setPosition(glm::vec3(0.0f));
-
-    opaqueObjectPool.push_back(cubeObj);
+    objManager->registerMeshObject(cube);
+    
 }
 
 void mouseCallback(GLFWwindow* window, double xpos, double ypos)
