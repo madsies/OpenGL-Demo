@@ -6,17 +6,19 @@
 class ObjectManager
 {
 public:
-public:
-	ObjectManager(GLuint* buffers, GLuint* vaos, GLuint* ebos);
+	ObjectManager(GLuint* buffers, GLuint* vaos, GLuint* ebos) : buffers(buffers), vaos(vaos), ebos(ebos)
+	{
+	}
 
 	int currentObject = 0;
 	std::vector<std::unique_ptr<Object>> opaqueObjectArray;
 	std::vector<std::unique_ptr<Object>> transparentObjectArray; // Separated since transparent objects need to be ordered correctly.
 
-	void registerMeshObject(Mesh& mesh);
-	void updateObjects(float deltaTime);
+	inline int registerMeshObject(Mesh& mesh);
+	void inline updateObjects(float deltaTime);
 
-	void renderObjects(GLuint program);
+	void inline renderObjects(GLuint program);
+	Object* getObject(int id);
 
 
 private:
@@ -29,20 +31,31 @@ private:
 	Registers an object into the main object array.
 */
 
-void ObjectManager::registerMeshObject(Mesh& mesh)
+int ObjectManager::registerMeshObject(Mesh& mesh)
 {
 	auto meshObj = std::make_unique<CustomObject>(
-		mesh,   // transfer mesh ownership
-		vaos[0],
-		buffers[0],
-		ebos[0]
+		mesh, 
+		vaos[currentObject],
+		buffers[currentObject],
+		ebos[currentObject]
 	);
-
-	meshObj->setScale(glm::vec3(2.0f));
-	meshObj->setPosition(glm::vec3(0.0f));
+	currentObject++;
 
 	opaqueObjectArray.push_back(std::move(meshObj));
+	return currentObject-1;
 }
+
+/*
+	Grabs Object from array
+*/
+
+Object* ObjectManager::getObject(int id)
+{
+	if (id >= opaqueObjectArray.size())
+		return nullptr; // invalid ID
+	return opaqueObjectArray[id].get();
+}
+
 /*
 	Renders objects in the correct order.
 */

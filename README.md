@@ -3,6 +3,7 @@
 - Goals
 - [ ] Lighting (Directional, Spotlight, Point)
 - [ ] Shadows (Directional, Spotlight, Point)
-- [ ] PBO
+- [ ] PBR 
 - [ ] Model Importing (.obj and more complex types)
 - [ ] Complex Interaction, i.e. destroying/creating.
+- [ ] Materials for objects

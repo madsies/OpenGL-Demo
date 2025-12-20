@@ -27,7 +27,7 @@ public:
 protected:
 	glm::mat4 modelMatrix{ 1.0f };
 
-	virtual void updateModelMatrix();
+	virtual inline void updateModelMatrix();
 
 };
 

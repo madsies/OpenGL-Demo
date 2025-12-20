@@ -67,12 +67,32 @@ void render(GLuint program)
     objManager->renderObjects(program); 
 }
 
-// Make Registry eventually, clean up main class.
 void createItems()
 {
+    int objId;
+    Object* obj;
+    CustomObject* ref;
+
     Mesh cube = Cube::generate();
-    objManager->registerMeshObject(cube);
-    
+    objId = objManager->registerMeshObject(cube);
+    obj = objManager->getObject(objId);
+
+    if (CustomObject* ref = dynamic_cast<CustomObject*>(objManager->getObject(objId)))
+    {
+        ref->setScale({ 4.0f, 4.0f, 4.0f });
+        ref->setPosition({ 0.0f, 0.0f, 0.0f });
+    }
+
+    Mesh cube2 = Cube::generate();
+
+    objId = objManager->registerMeshObject(cube2);
+    obj = objManager->getObject(objId);
+
+    if (CustomObject* ref = dynamic_cast<CustomObject*>(objManager->getObject(objId)))
+    {
+        ref->setScale({ 1.0f, 1.0f, 1.0f });
+        ref->setPosition({ 5.0f, 0.0f, 0.0f });
+    }
 }
 
 void mouseCallback(GLFWwindow* window, double xpos, double ypos)

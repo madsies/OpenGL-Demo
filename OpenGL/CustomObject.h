@@ -31,6 +31,8 @@ public:
        
     glm::mat4 getModelMatrix() const;
 
+    void updateModelMatrix();
+
 private:
 
     glm::mat4 modelMatrix = glm::mat4(1.0f);

@@ -137,6 +137,7 @@
     <ClInclude Include="cube.h" />
     <ClInclude Include="flying_camera.h" />
     <ClInclude Include="object.h" />
+    <ClInclude Include="objectManager.h" />
     <ClInclude Include="objectStructs.h" />
     <ClInclude Include="shader.h" />
   </ItemGroup>

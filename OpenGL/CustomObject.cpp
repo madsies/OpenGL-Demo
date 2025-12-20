@@ -1,11 +1,8 @@
 #include <glad/glad.h>
-#include "CustomObject.h"
 #include <glm/gtc/type_ptr.hpp>
+#include "CustomObject.h"
 
-glm::mat4 CustomObject::getModelMatrix() const
-{
-    return modelMatrix;
-}
+
 
 CustomObject::CustomObject(const Mesh& mesh, GLuint vaoID, GLuint vboID, GLuint eboID) 
 {
@@ -17,10 +14,10 @@ CustomObject::CustomObject(const Mesh& mesh, GLuint vaoID, GLuint vboID, GLuint 
 
     // vert, idx data
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glNamedBufferStorage(vbo, mesh.vertices.size() * sizeof(Vertex), mesh.vertices.data(), 0);
+    glNamedBufferStorage(vbo, mesh.vertices.size() * sizeof(Vertex), mesh.vertices.data(), GL_DYNAMIC_STORAGE_BIT);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glNamedBufferStorage(ebo, mesh.indices.size() * sizeof(unsigned int), mesh.indices.data(), 0);
+    glNamedBufferStorage(ebo, mesh.indices.size() * sizeof(unsigned int), mesh.indices.data(), GL_DYNAMIC_STORAGE_BIT);
 
     // binding
     glVertexArrayVertexBuffer(vao, 0, vbo, 0, sizeof(Vertex));
@@ -41,6 +38,11 @@ CustomObject::CustomObject(const Mesh& mesh, GLuint vaoID, GLuint vboID, GLuint 
     updateModelMatrix();
 }
 
+glm::mat4 CustomObject::getModelMatrix() const
+{
+    return modelMatrix;
+}
+
 void CustomObject::draw(GLuint shaderProgram)
 {
     GLuint modelLocation = glGetUniformLocation(shaderProgram, "model");
@@ -54,5 +56,16 @@ void CustomObject::draw(GLuint shaderProgram)
 void CustomObject::update(float deltaTime)
 {
     return;
+}
+
+void CustomObject::updateModelMatrix()
+{
+    glm::mat4 mat = glm::mat4(1.0f);
+    mat = glm::translate(mat, position);
+    mat = glm::rotate(mat, glm::radians(rotation.x), glm::vec3(1, 0, 0));
+    mat = glm::rotate(mat, glm::radians(rotation.y), glm::vec3(0, 1, 0));
+    mat = glm::rotate(mat, glm::radians(rotation.z), glm::vec3(0, 0, 1));
+    mat = glm::scale(mat, scale);
+    modelMatrix = mat;
 }
 
