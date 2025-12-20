@@ -53,6 +53,9 @@
     <ClInclude Include="instancedObjects.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="perlin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="basic_shader.vert" />

@@ -19,3 +19,9 @@ struct Mesh
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
 };
+
+struct Ray // For raycasting etc.
+{
+	glm::vec3 origin;
+	glm::vec3 direction; // n
+};

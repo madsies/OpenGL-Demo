@@ -12,6 +12,7 @@
 #include <iomanip> 
 #include "objectManager.h"
 #include "instancedObjects.h"
+#include "perlin.h"
 
 // Buffer Consts
 constexpr int BUFFER_COUNT = 3;
@@ -63,7 +64,7 @@ void render(GLuint program)
     glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, glm::value_ptr(view));
 
     glm::mat4 projection = glm::mat4(1.f);
-    projection = glm::perspective(glm::radians(45.f), (float) SCREEN_WIDTH / (float) SCREEN_HEIGHT, .1f, 50.f);
+    projection = glm::perspective(glm::radians(45.f), (float) SCREEN_WIDTH / (float) SCREEN_HEIGHT, .1f, 100.f);
     glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
     objManager->renderObjects(program); 
@@ -98,9 +99,12 @@ void createItems()
         ref->setPosition({ 5.0f, 0.0f, 0.0f });
     }
 
-    cubeBatch =  new InstancedObjectBatch(cube, VAOs[2], Buffers[2], EBOs[2], 50*50);
-    for (int i = 0; i < 50 * 50; ++i) {
-        glm::mat4 m = glm::translate(glm::mat4(1.0f), glm::vec3((i * 1) % 50 , sin(i) * cos(i), (i / 50)));
+    cubeBatch =  new InstancedObjectBatch(cube, VAOs[2], Buffers[2], EBOs[2], 500*500);
+    for (int i = 0; i < 500 * 500; ++i) {
+        int x = i % 500;
+        int z = i / 500;
+        float y = floor((perlinNoiseFractal(x * 0.02f, z * 0.02f) + 1.0f) * 10.f - 8.f);
+        glm::mat4 m = glm::translate(glm::mat4(1.0f), glm::vec3(x,y,z));
         cubeBatch->addInstance(m);
     }
 }
@@ -183,11 +187,19 @@ int main()
     // Mouse input
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, mouseCallback);
+    
+    // MSAA
+    glfwWindowHint(GLFW_SAMPLES, 4);
+    glEnable(GL_MULTISAMPLE);
 
 
     glGenVertexArrays(VAO_COUNT, VAOs);
     glGenBuffers(BUFFER_COUNT, Buffers);
     glGenBuffers(EBO_COUNT, EBOs);
+
+    glEnable(GL_CULL_FACE);   
+    glCullFace(GL_BACK);        
+    glFrontFace(GL_CCW);
 
     glEnable(GL_DEPTH_TEST);
 
