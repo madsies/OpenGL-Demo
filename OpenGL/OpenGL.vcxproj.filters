@@ -50,6 +50,9 @@
     <ClInclude Include="objectManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="instancedObjects.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="basic_shader.vert" />

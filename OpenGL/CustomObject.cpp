@@ -47,6 +47,7 @@ void CustomObject::draw(GLuint shaderProgram)
 {
     GLuint modelLocation = glGetUniformLocation(shaderProgram, "model");
     glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+    glUniform1i(glGetUniformLocation(shaderProgram, "useInstance"), GL_FALSE);
 
     glBindVertexArray(vao);
     glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);

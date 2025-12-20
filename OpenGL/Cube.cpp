@@ -25,7 +25,7 @@ Mesh Cube::generate()
 
 			Vertex v;
 			v.pos = glm::vec3(pos[0], pos[1], pos[2]);
-			v.colour = glm::vec3( i % 10 /10.f, i % 40 / 80.f, i % 160 / 480.f);
+			v.colour = glm::vec3(0.7f, 0.2f, 0.2f);
 
 			meshData.vertices.push_back(v);
 		}

@@ -11,11 +11,12 @@
 #include <sstream>
 #include <iomanip> 
 #include "objectManager.h"
+#include "instancedObjects.h"
 
 // Buffer Consts
-constexpr int BUFFER_COUNT = 2;
-constexpr int VAO_COUNT = 2;
-constexpr int EBO_COUNT = 2;
+constexpr int BUFFER_COUNT = 3;
+constexpr int VAO_COUNT = 3;
+constexpr int EBO_COUNT = 3;
 GLuint Buffers[BUFFER_COUNT];
 GLuint VAOs[VAO_COUNT];
 GLuint EBOs[EBO_COUNT];
@@ -26,6 +27,7 @@ constexpr int SCREEN_HEIGHT = 1080;
 
 // Object Management
 ObjectManager* objManager = new ObjectManager(Buffers, VAOs, EBOs);
+InstancedObjectBatch* cubeBatch;
 
 // Background Col
 static const GLfloat bgd[] = { 0.35f, 0.35f, 0.35f, 0.35f };
@@ -65,6 +67,8 @@ void render(GLuint program)
     glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
     objManager->renderObjects(program); 
+
+    cubeBatch->draw(program);
 }
 
 void createItems()
@@ -92,6 +96,12 @@ void createItems()
     {
         ref->setScale({ 1.0f, 1.0f, 1.0f });
         ref->setPosition({ 5.0f, 0.0f, 0.0f });
+    }
+
+    cubeBatch =  new InstancedObjectBatch(cube, VAOs[2], Buffers[2], EBOs[2], 50*50);
+    for (int i = 0; i < 50 * 50; ++i) {
+        glm::mat4 m = glm::translate(glm::mat4(1.0f), glm::vec3((i * 1) % 50 , sin(i) * cos(i), (i / 50)));
+        cubeBatch->addInstance(m);
     }
 }
 
