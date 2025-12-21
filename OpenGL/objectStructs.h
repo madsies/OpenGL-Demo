@@ -11,7 +11,8 @@ struct Vertex
 {
 	glm::vec3 pos;  
 	glm::vec3 colour;
-	// Space to add extra data (normals, etc.) later. on
+	glm::vec3 normal;
+	glm::vec2 uv;
 };
 
 struct Mesh

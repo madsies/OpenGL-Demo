@@ -2,8 +2,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "CustomObject.h"
 
-
-
 CustomObject::CustomObject(const Mesh& mesh, GLuint vaoID, GLuint vboID, GLuint eboID) 
 {
     vao = vaoID;
@@ -19,19 +17,29 @@ CustomObject::CustomObject(const Mesh& mesh, GLuint vaoID, GLuint vboID, GLuint 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glNamedBufferStorage(ebo, mesh.indices.size() * sizeof(unsigned int), mesh.indices.data(), GL_DYNAMIC_STORAGE_BIT);
 
-    // binding
     glVertexArrayVertexBuffer(vao, 0, vbo, 0, sizeof(Vertex));
     glVertexArrayElementBuffer(vao, ebo);
 
-    // position data
+    // Position
     glEnableVertexArrayAttrib(vao, 0);
+    glVertexArrayAttribFormat(vao, 0, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, pos));
     glVertexArrayAttribBinding(vao, 0, 0);
 
-    glVertexArrayAttribFormat(vao, 0, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, pos));
-    // Colour  data
+    // Colour
     glEnableVertexArrayAttrib(vao, 1);
     glVertexArrayAttribFormat(vao, 1, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, colour));
     glVertexArrayAttribBinding(vao, 1, 0);
+
+    // Normal
+    glEnableVertexArrayAttrib(vao, 2);
+    glVertexArrayAttribFormat(vao, 2, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, normal));
+    glVertexArrayAttribBinding(vao, 2, 0);
+
+    // UV
+    glEnableVertexArrayAttrib(vao, 3);
+    glVertexArrayAttribFormat(vao, 3, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex, uv));
+    glVertexArrayAttribBinding(vao, 3, 0);
+
 
     glBindVertexArray(0);
 

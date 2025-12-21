@@ -14,6 +14,24 @@ Mesh Cube::generate()
 		{ {-0.5f, -0.5f, -0.5f}, {0.5f, -0.5f, -0.5f}, {0.5f, 0.5f, -0.5f}, {-0.5f, 0.5f, -0.5f} }
 	};
 
+	const glm::vec3 normals[6] =
+	{
+		{ 1, 0, 0 },   // +X
+		{-1, 0, 0 },   // -X
+		{ 0, 1, 0 },   // +Y
+		{ 0,-1, 0 },   // -Y
+		{ 0, 0, 1 },   // +Z
+		{ 0, 0,-1 }    // -Z
+	};
+
+	const glm::vec2 uvs[4] =
+	{
+		{0.0f, 0.0f},
+		{1.0f, 0.0f},
+		{1.0f, 1.0f},
+		{0.0f, 1.0f}
+	};
+
 
 	unsigned int vertexOffset = 0;
 
@@ -26,6 +44,8 @@ Mesh Cube::generate()
 			Vertex v;
 			v.pos = glm::vec3(pos[0], pos[1], pos[2]);
 			v.colour = glm::vec3(0.7f, 0.2f, 0.2f);
+			v.normal = normals[face];
+			v.uv = uvs[i];
 
 			meshData.vertices.push_back(v);
 		}

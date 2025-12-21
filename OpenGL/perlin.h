@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cmath>
+#include <chrono>
+#include <random>
 
 // Permutation taken from the wikipedia page on perlin noise
 
@@ -25,6 +27,12 @@ int p[512];
 
 void initPermutation()
 {
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::default_random_engine rng(seed);
+
+    // Shuffles permutation for new seeds
+    std::shuffle(permutation, permutation + 256, rng);
+
     for (int i = 0; i < 256; ++i)
         p[256 + i] = p[i] = permutation[i];
 }
@@ -92,7 +100,7 @@ float perlinNoise(float x, float y, float z = 0.0f)
     Octaves - amount of passes.
 */
 
-float perlinNoiseFractal(float x, float y, float z = 0.0f, int octaves = 4, float persistence = 0.5f)
+float perlinNoiseFractal(float x, float y, float z = 0.0f, int octaves = 12, float persistence = 0.4f)
 {
     float total = 0.0f;
     float frequency = 1.0f;
