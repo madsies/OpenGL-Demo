@@ -15,6 +15,8 @@
 #include "perlin.h"
 #include "skybox.h"
 #include "texture.h"
+#include "shadow.h"
+#include "frustum_culling.h"
 
 
 // Buffer Consts
@@ -44,6 +46,13 @@ GLuint boxShader;
 Camera *camera;
 FlyingCamera flyingCamera;
 
+// DirectionalLight
+glm::vec3 dirLight = glm::vec3(0.0f);
+DirectionalShadow* sunShadow;
+
+// Culling
+FCulling* culler;
+
 /*
     Skybox setup
 */
@@ -71,6 +80,7 @@ void renderSkybox(glm::mat4 view, glm::mat4 projection)
     glm::mat4 rotView = glm::mat4(glm::mat3(view)); 
     glUniformMatrix4fv(glGetUniformLocation(skyShader, "view"), 1, GL_FALSE, glm::value_ptr(rotView));
     glUniformMatrix4fv(glGetUniformLocation(skyShader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+
 
     glBindVertexArray(skyboxVAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -101,20 +111,48 @@ void render(GLuint program)
 
     glm::mat4 view;
     view = glm::lookAt(camera->Position, camera->Position + camera->Front, camera->Up);
+    
 
     glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, glm::value_ptr(view));
 
+    glUniform3fv(glGetUniformLocation(program, "viewPos"), 1, glm::value_ptr(camera->Position));
+    glUniform3fv(glGetUniformLocation(program, "lightPos"), 1, glm::value_ptr(sunShadow->lightPos));
+    glUniform3fv(glGetUniformLocation(program, "dirLightDirection"), 1, glm::value_ptr(dirLight));
+    glUniformMatrix4fv(glGetUniformLocation(program, "lightSpaceMatrix"),1, GL_FALSE,glm::value_ptr(sunShadow->lightSpaceMatrix));
+    
+    glActiveTexture(GL_TEXTURE5);
+    glBindTexture(GL_TEXTURE_2D, sunShadow->depthMap);
+    glUniform1i(glGetUniformLocation(program, "shadowMap"), 5);
+
     glm::mat4 projection = glm::mat4(1.f);
-    projection = glm::perspective(glm::radians(85.f), (float) SCREEN_WIDTH / (float) SCREEN_HEIGHT, .1f, 1000.f);
+    projection = glm::perspective(glm::radians(85.f), (float) SCREEN_WIDTH / (float) SCREEN_HEIGHT, .1f, 200.f);
     glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
-    objManager->renderObjects(program); 
+    FCulling culler(&projection, &view);
 
-    cubeBatch->draw(program);
+    objManager->renderObjects(program); 
+    cubeBatch->draw(program, &culler);
     
     glDisable(GL_CULL_FACE);
     renderSkybox(view, projection);
     glEnable(GL_CULL_FACE);
+}
+
+void update(GLuint program, float deltaTime)
+{
+    static float sunTime = 0.0f;
+    sunTime += deltaTime; 
+
+    float speed = 0.1f;
+    float angle = sunTime * speed;
+
+    dirLight.x = sin(angle);
+    dirLight.y = -0.5f;      
+    dirLight.z = cos(angle);
+
+    dirLight = glm::normalize(dirLight);
+
+    sunShadow->updateLightSpaceMatrix(dirLight, camera->Position, camera->Front);
 }
 
 void createItems()
@@ -129,8 +167,8 @@ void createItems()
 
     if (CustomObject* ref = dynamic_cast<CustomObject*>(objManager->getObject(objId)))
     {
-        ref->setScale({ 4.0f, 4.0f, 4.0f });
-        ref->setPosition({ 0.0f, 0.0f, 0.0f });
+        ref->setScale({ 32.0f, 32.0f, 32.0f });
+        ref->setPosition({ 250.0f, 20.0f, 250.0f });
     }
 
     Mesh cube2 = Cube::generate();
@@ -144,14 +182,16 @@ void createItems()
         ref->setPosition({ 5.0f, 0.0f, 0.0f });
     }
 
-    cubeBatch =  new InstancedObjectBatch(cube, 500*500);
-    for (int i = 0; i < 500 * 500; ++i) {
-        int x = i % 500;
-        int z = i / 500;
-        float y = floor((perlinNoiseFractal(x / 500.f, z / 500.f)+1.f) * 128.f - 127.f);
+    cubeBatch = new InstancedObjectBatch(cube, 1024*1024, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1024.0f, 0.0f, 1024.0f));
+    for (int i = 0; i < 512 * 512; ++i) 
+    {
+        int x = i % 512;
+        int z = i / 512;
+        float y = floor((perlinNoiseFractal(x / 512.f, z / 512.f)+1.f) * 128.f - 127.f);
         glm::mat4 m = glm::translate(glm::mat4(1.0f), glm::vec3(x,y,z));
         cubeBatch->addInstance(m);
     }
+    cubeBatch->finalizeChunks();
 }
 
 void mouseCallback(GLFWwindow* window, double xpos, double ypos)
@@ -193,9 +233,29 @@ void updateWindowTitle(GLFWwindow* window, const Camera* cam)
     glfwSetWindowTitle(window, ss.str().c_str());
 }
 
+void renderShadowPass(GLuint shadowShader)
+{
+    glDisable(GL_MULTISAMPLE);
 
+    glViewport(0, 0, DirectionalShadow::SHADOW_WIDTH, DirectionalShadow::SHADOW_HEIGHT);
+    glBindFramebuffer(GL_FRAMEBUFFER, sunShadow->depthFBO);
+    glClear(GL_DEPTH_BUFFER_BIT);
 
+    glUseProgram(shadowShader);
 
+    glUniformMatrix4fv(
+        glGetUniformLocation(shadowShader, "lightSpaceMatrix"),
+        1, GL_FALSE, glm::value_ptr(sunShadow->lightSpaceMatrix)
+    );
+
+    FCulling culler(sunShadow->lightSpaceMatrix);
+
+    objManager->renderObjects(shadowShader);
+    cubeBatch->draw(shadowShader, nullptr);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glEnable(GL_MULTISAMPLE);
+}
 
 /*
     Printing OpenGL Errors to console
@@ -209,6 +269,8 @@ void APIENTRY DebugCallback(GLenum source, GLenum type, GLuint id, GLenum severi
     }
 }
 
+
+int frame = 0;
 
 int main()
 {
@@ -229,6 +291,10 @@ int main()
         return -1;
     }
 
+    
+
+    sunShadow = new DirectionalShadow();
+
     // Debug
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(DebugCallback, 0);
@@ -240,7 +306,6 @@ int main()
     // MSAA
     glfwWindowHint(GLFW_SAMPLES, 4);
     glEnable(GL_MULTISAMPLE);
-
 
     glGenVertexArrays(VAO_COUNT, VAOs);
     glGenBuffers(BUFFER_COUNT, Buffers);
@@ -260,27 +325,34 @@ int main()
     glm::mat4 projection = glm::mat4(1.0f);
 
     GLuint program = CompileShader("basic_shader.vert", "basic_shader.frag");
-    boxShader = CompileShader("cube.vert", "cube.frag");
     skyShader = CompileShader("skybox.vert", "skybox.frag");
+
+    createItems();
+
+    GLuint shadowShader = CompileShader("shadow.vert", "shadow.frag");
 
     setupSkybox(window);
     
-    createItems();
+    
 
     // Main Window Loop
     float last = 0.f;
 
+    glEnable(GL_DEPTH_TEST);
+    
 
     while (!glfwWindowShouldClose(window))
     {
         // DeltaTime for updates
         float current = glfwGetTime();
         float deltaTime = current - last;
-        updateWindowTitle(window, camera);
-           
         last = current;
+        updateWindowTitle(window, camera);
+        update(program, deltaTime);
+        frame++;
 
         
+        renderShadowPass(shadowShader);
         render(program);
         
         camera->ProcessKeyboardInput(window, deltaTime);

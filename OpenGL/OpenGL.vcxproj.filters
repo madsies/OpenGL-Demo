@@ -65,13 +65,22 @@
     <ClInclude Include="texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="shadow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frustum_culling.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bvh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="basic_shader.vert" />
     <None Include="basic_shader.frag" />
-    <None Include="cube.vert" />
-    <None Include="cube.frag" />
     <None Include="skybox.vert" />
     <None Include="skybox.frag" />
+    <None Include="shadow.vert" />
+    <None Include="shadow.frag" />
   </ItemGroup>
 </Project>

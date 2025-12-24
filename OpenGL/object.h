@@ -2,6 +2,7 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include "bvh.h"
 
 /*
 
@@ -19,6 +20,9 @@ public:
 
 	GLuint vao, vbo, ebo;
 	GLsizei indexCount;
+	//AABB bounds;
+	//glm::vec3 centroid;
+	//Mesh mesh;
 
 	glm::vec3 position = {};
 	glm::vec3 rotation = {};
@@ -39,4 +43,7 @@ void Object::updateModelMatrix()
 	modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.y), { 0,1,0 });
 	modelMatrix = glm::rotate(modelMatrix, glm::radians(rotation.z), { 0,0,1 });
 	modelMatrix = glm::scale(modelMatrix, scale);
+
+	//bounds = computeAABB(mesh, modelMatrix);
+	//centroid = (bounds.min + bounds.max) * 0.5f;
 }

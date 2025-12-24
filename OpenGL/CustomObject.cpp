@@ -2,7 +2,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "CustomObject.h"
 
-CustomObject::CustomObject(const Mesh& mesh, GLuint vaoID, GLuint vboID, GLuint eboID) 
+CustomObject::CustomObject(const Mesh& mesh, GLuint vaoID, GLuint vboID, GLuint eboID)
 {
     vao = vaoID;
     vbo = vboID;

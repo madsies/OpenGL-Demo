@@ -135,23 +135,26 @@
     <ClCompile Include="stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="bvh.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="cube.h" />
     <ClInclude Include="flying_camera.h" />
+    <ClInclude Include="frustum_culling.h" />
     <ClInclude Include="instancedObjects.h" />
     <ClInclude Include="object.h" />
     <ClInclude Include="objectManager.h" />
     <ClInclude Include="objectStructs.h" />
     <ClInclude Include="perlin.h" />
     <ClInclude Include="shader.h" />
+    <ClInclude Include="shadow.h" />
     <ClInclude Include="skybox.h" />
     <ClInclude Include="texture.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="basic_shader.frag" />
     <None Include="basic_shader.vert" />
-    <None Include="cube.frag" />
-    <None Include="cube.vert" />
+    <None Include="shadow.frag" />
+    <None Include="shadow.vert" />
     <None Include="skybox.frag" />
     <None Include="skybox.vert" />
   </ItemGroup>
