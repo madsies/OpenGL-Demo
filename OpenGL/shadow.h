@@ -16,7 +16,7 @@ public:
     glm::mat4 lightSpaceMatrix = glm::mat4(1.0f);
 
     float orthoSize = 128.0f;
-    float nearPlane = 0.1f;
+    float nearPlane = 1.0f;
     float farPlane = 256.0f;
     glm::vec3 lightPos;
 
@@ -68,8 +68,10 @@ public:
             nearPlane, farPlane
         );
 
-        glm::vec3 center = camPos + camFront * farPlane; 
-        glm::vec3 lightPos = center - lightDirection * farPlane * 2.f; 
+        int shadowDistance = 256;
+
+        glm::vec3 center = camPos + camFront;
+        glm::vec3 lightPos = center - lightDirection * farPlane * 0.5f; 
 
         glm::mat4 lightView = glm::lookAt(
             lightPos,

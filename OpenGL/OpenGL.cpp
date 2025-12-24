@@ -125,7 +125,7 @@ void render(GLuint program)
     glUniform1i(glGetUniformLocation(program, "shadowMap"), 5);
 
     glm::mat4 projection = glm::mat4(1.f);
-    projection = glm::perspective(glm::radians(85.f), (float) SCREEN_WIDTH / (float) SCREEN_HEIGHT, .1f, 200.f);
+    projection = glm::perspective(glm::radians(85.f), (float) SCREEN_WIDTH / (float) SCREEN_HEIGHT, .1f, 10000.f);
     glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
     FCulling culler(&projection, &view);
@@ -147,7 +147,7 @@ void update(GLuint program, float deltaTime)
     float angle = sunTime * speed;
 
     dirLight.x = sin(angle);
-    dirLight.y = -0.5f;      
+    dirLight.y = -0.2f;      
     dirLight.z = cos(angle);
 
     dirLight = glm::normalize(dirLight);
@@ -182,12 +182,12 @@ void createItems()
         ref->setPosition({ 5.0f, 0.0f, 0.0f });
     }
 
-    cubeBatch = new InstancedObjectBatch(cube, 1024*1024, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1024.0f, 0.0f, 1024.0f));
-    for (int i = 0; i < 512 * 512; ++i) 
+    cubeBatch = new InstancedObjectBatch(cube, 1024*1024, glm::vec3(-512.0f, 0.0f, -512.0f), glm::vec3(512.0f, 0.0f, 512.0f));
+    for (int i = 0; i < 1024 * 1024; ++i)
     {
-        int x = i % 512;
-        int z = i / 512;
-        float y = floor((perlinNoiseFractal(x / 512.f, z / 512.f)+1.f) * 128.f - 127.f);
+        int x = (i % 1024) - 512;
+        int z = (i / 1024) - 512;;
+        float y = floor((perlinNoiseFractal(x / 512.f, z / 512.f)+1.f) * 256.f - 256.f);
         glm::mat4 m = glm::translate(glm::mat4(1.0f), glm::vec3(x,y,z));
         cubeBatch->addInstance(m);
     }
@@ -236,6 +236,7 @@ void updateWindowTitle(GLFWwindow* window, const Camera* cam)
 void renderShadowPass(GLuint shadowShader)
 {
     glDisable(GL_MULTISAMPLE);
+    glCullFace(GL_FRONT);
 
     glViewport(0, 0, DirectionalShadow::SHADOW_WIDTH, DirectionalShadow::SHADOW_HEIGHT);
     glBindFramebuffer(GL_FRAMEBUFFER, sunShadow->depthFBO);
@@ -251,9 +252,10 @@ void renderShadowPass(GLuint shadowShader)
     FCulling culler(sunShadow->lightSpaceMatrix);
 
     objManager->renderObjects(shadowShader);
-    cubeBatch->draw(shadowShader, nullptr);
+    cubeBatch->draw(shadowShader, &culler);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glCullFace(GL_BACK);
     glEnable(GL_MULTISAMPLE);
 }
 
@@ -349,9 +351,7 @@ int main()
         last = current;
         updateWindowTitle(window, camera);
         update(program, deltaTime);
-        frame++;
 
-        
         renderShadowPass(shadowShader);
         render(program);
         

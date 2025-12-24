@@ -20,7 +20,7 @@ public:
     }
 
     FlyingCamera() {
-        Position = glm::vec3(250.0f, 30.0f, 250.0f);
+        Position = glm::vec3(256.0f, 64.0f, 256.0f);
         Front = glm::vec3(0.0f, 0.0f, -1.0f);
         Up = glm::vec3(0.0f, 1.0f, 0.0f);
     }
@@ -35,7 +35,7 @@ public:
         glm::vec3 right = glm::normalize(glm::cross(Front, Up));
         // Speed boost
         if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-            velocity = Speed * deltaTime * 2;
+            velocity = Speed * deltaTime * 5;
 
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
             Position += Front * velocity;

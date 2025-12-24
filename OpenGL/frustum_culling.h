@@ -8,7 +8,7 @@ class FCulling
 public:
 	FCulling(glm::mat4 *proj, glm::mat4 *vw) : projection(proj), view(vw) {
 	
-        glm::mat4 clip = *proj * *vw; // VP
+        glm::mat4 clip = *proj * *vw;
         transform(clip);
 	};
 
@@ -66,9 +66,6 @@ public:
             planes[i] /= len;
         }
     }
-
-
-
 
 	bool isInFrustum(glm::vec3 center, float radius)
 	{
