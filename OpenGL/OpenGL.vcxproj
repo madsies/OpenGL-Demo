@@ -128,6 +128,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BVH.cpp" />
     <ClCompile Include="Cube.cpp" />
     <ClCompile Include="CustomObject.cpp" />
     <ClCompile Include="CustomObject.h" />

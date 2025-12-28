@@ -1,21 +1,22 @@
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 #include "CustomObject.h"
+#include "bvh.h"
 
-CustomObject::CustomObject(const Mesh& mesh, GLuint vaoID, GLuint vboID, GLuint eboID)
+CustomObject::CustomObject(const Mesh& m)
 {
-    vao = vaoID;
-    vbo = vboID;
-    ebo = eboID;
+    glCreateVertexArrays(1, &vao);
+    glCreateBuffers(1, &vbo);
+    glCreateBuffers(1, &ebo);
+
+    mesh = m;
     indexCount = mesh.indices.size();
     glBindVertexArray(vao);
 
     // vert, idx data
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glNamedBufferStorage(vbo, mesh.vertices.size() * sizeof(Vertex), mesh.vertices.data(), GL_DYNAMIC_STORAGE_BIT);
+    glNamedBufferStorage(vbo,mesh.vertices.size() * sizeof(Vertex),mesh.vertices.data(),0);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glNamedBufferStorage(ebo, mesh.indices.size() * sizeof(unsigned int), mesh.indices.data(), GL_DYNAMIC_STORAGE_BIT);
+    glNamedBufferStorage(ebo,mesh.indices.size() * sizeof(unsigned int), mesh.indices.data(),0);
 
     glVertexArrayVertexBuffer(vao, 0, vbo, 0, sizeof(Vertex));
     glVertexArrayElementBuffer(vao, ebo);
@@ -62,19 +63,13 @@ void CustomObject::draw(GLuint shaderProgram)
     glBindVertexArray(0);
 }
 
+void CustomObject::updateModelMatrix(){
+    Object::updateModelMatrix();
+    bounds = BVH::computeAABB(mesh, modelMatrix);
+    centroid = (bounds.min + bounds.max) * 0.5f;
+}
+
 void CustomObject::update(float deltaTime)
 {
     return;
 }
-
-void CustomObject::updateModelMatrix()
-{
-    glm::mat4 mat = glm::mat4(1.0f);
-    mat = glm::translate(mat, position);
-    mat = glm::rotate(mat, glm::radians(rotation.x), glm::vec3(1, 0, 0));
-    mat = glm::rotate(mat, glm::radians(rotation.y), glm::vec3(0, 1, 0));
-    mat = glm::rotate(mat, glm::radians(rotation.z), glm::vec3(0, 0, 1));
-    mat = glm::scale(mat, scale);
-    modelMatrix = mat;
-}
-

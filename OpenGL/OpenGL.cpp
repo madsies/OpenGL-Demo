@@ -32,7 +32,7 @@ constexpr int SCREEN_WIDTH = 1920;
 constexpr int SCREEN_HEIGHT = 1080;
 
 // Object Management
-ObjectManager* objManager = new ObjectManager(Buffers, VAOs, EBOs);
+ObjectManager* objManager = new ObjectManager();
 InstancedObjectBatch* cubeBatch;
 
 // Background Col
@@ -271,7 +271,6 @@ void APIENTRY DebugCallback(GLenum source, GLenum type, GLuint id, GLenum severi
     }
 }
 
-
 int frame = 0;
 
 int main()
@@ -292,8 +291,6 @@ int main()
         std::cerr << "Failed to initialize GLAD\n";
         return -1;
     }
-
-    
 
     sunShadow = new DirectionalShadow();
 

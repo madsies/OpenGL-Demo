@@ -21,6 +21,12 @@ struct Mesh
 	std::vector<unsigned int> indices;
 };
 
+struct AABB // Bounding box
+{
+	glm::vec3 min;
+	glm::vec3 max;
+};
+
 struct Ray // For raycasting etc.
 {
 	glm::vec3 origin;

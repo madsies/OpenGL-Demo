@@ -1,12 +1,20 @@
 #include "object.h"
 #include "objectStructs.h"
+#include "bvh.h"
 #include <GLFW/glfw3.h>
 
 
 class CustomObject : public Object
 {
 public:
-    CustomObject(const Mesh& mesh, GLuint vaoID, GLuint vboID, GLuint eboID);
+    CustomObject(const Mesh& mesh);
+
+    ~CustomObject()
+    {
+        glDeleteVertexArrays(1, &vao);
+        glDeleteBuffers(1, &vbo);
+        glDeleteBuffers(1, &ebo);
+    }
 
     void draw(GLuint shaderProgram);
     void update(float deltaTime);
@@ -32,6 +40,7 @@ public:
     glm::mat4 getModelMatrix() const;
 
     void updateModelMatrix();
+        
 
 private:
 

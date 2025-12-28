@@ -6,9 +6,7 @@
 class ObjectManager
 {
 public:
-	ObjectManager(GLuint* buffers, GLuint* vaos, GLuint* ebos) : buffers(buffers), vaos(vaos), ebos(ebos)
-	{
-	}
+	ObjectManager();
 
 	int currentObject = 0;
 	std::vector<std::unique_ptr<Object>> opaqueObjectArray;
@@ -20,25 +18,19 @@ public:
 	void inline renderObjects(GLuint program);
 	Object* getObject(int id);
 
-
-private:
-	GLuint* buffers;
-	GLuint* vaos;
-	GLuint* ebos;
 };
 
 /*
 	Registers an object into the main object array.
 */
 
+inline ObjectManager::ObjectManager()
+{
+}
+
 int ObjectManager::registerMeshObject(Mesh& mesh)
 {
-	auto meshObj = std::make_unique<CustomObject>(
-		mesh, 
-		vaos[currentObject],
-		buffers[currentObject],
-		ebos[currentObject]
-	);
+	auto meshObj = std::make_unique<CustomObject>(mesh);
 	currentObject++;
 
 	opaqueObjectArray.push_back(std::move(meshObj));
